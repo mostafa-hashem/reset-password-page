@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إعادة تعيين كلمة المرور - Reset Password</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <!-- Fonts -->
+    <link rel="stylesheet" href="fonts.css">
+</head>
+
+<body>
+    <div class="container">
+        <div class="reset-card" id="resetCard">
+            <div class="icon-container">
+                <svg class="reset-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                        d="M12 2C13.1 2 14 2.9 14 4V5H16V7H8V5H10V4C10 3.45 10.45 3 11 3C11.55 3 12 3.45 12 4V5C13.66 5 15 6.34 15 8V10H9V8C9 7.45 9.45 7 10 7C10.55 7 11 7.45 11 8V9H13V8C13 7.45 12.55 7 12 7C11.45 7 11 7.45 11 8V9H7V8C7 5.79 8.79 4 11 4C11.55 4 12 3.55 12 3C12 2.45 11.55 2 11 2C9.35 2 8 3.35 8 5V7H6V5H8V4C8 2.9 8.9 2 10 2C10.55 2 11 2.45 11 3C11.55 3 12 2.55 12 2Z"
+                        fill="#F0803C" />
+                    <path
+                        d="M18 10V8C18 6.34 16.66 5 15 5V4C15 2.9 14.1 2 13 2C12.45 2 12 2.45 12 3C12.55 3 13 2.55 13 2C13.55 2 14 2.45 14 3V4C15.1 4 16 4.9 16 6V8H18V10Z"
+                        fill="#F0803C" />
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2" fill="#F0803C" fill-opacity="0.1"
+                        stroke="#F0803C" stroke-width="2" />
+                    <circle cx="12" cy="16" r="3" fill="none" stroke="#F0803C" stroke-width="2" />
+                </svg>
+            </div>
+
+            <div class="content">
+                <h1 class="arabic-title">إعادة تعيين كلمة المرور</h1>
+                <h1 class="english-title">Reset Password</h1>
+
+                <div id="initialMessage">
+                    <p class="arabic-message">
+                        أدخل كلمة المرور الجديدة الخاصة بك.
+                    </p>
+                    <p class="english-message">
+                        Enter your new password.
+                    </p>
+                </div>
+
+                <form id="resetForm" class="reset-form">
+                    <div class="form-group">
+                        <label for="newPassword" class="arabic-label">كلمة المرور الجديدة</label>
+                        <label for="newPassword" class="english-label">New Password</label>
+                        <div class="password-input-container">
+                            <input type="password" id="newPassword" name="newPassword" required minlength="8"
+                                class="password-input" placeholder="أدخل كلمة مرور جديدة">
+                            <button type="button" class="toggle-password" data-target="newPassword">
+                                <svg viewBox="0 0 24 24" width="20" height="20">
+                                    <path
+                                        d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="confirmPassword" class="arabic-label">تأكيد كلمة المرور</label>
+                        <label for="confirmPassword" class="english-label">Confirm Password</label>
+                        <div class="password-input-container">
+                            <input type="password" id="confirmPassword" name="confirmPassword" required minlength="8"
+                                class="password-input" placeholder="أعد إدخال كلمة المرور">
+                            <button type="button" class="toggle-password" data-target="confirmPassword">
+                                <svg viewBox="0 0 24 24" width="20" height="20">
+                                    <path
+                                        d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="password-requirements">
+                        <p class="arabic-requirements">كلمة المرور يجب أن تحتوي على:</p>
+                        <p class="english-requirements">Password must contain:</p>
+                        <ul>
+                            <li class="arabic-req">8 أحرف على الأقل</li>
+                            <li class="english-req">At least 8 characters</li>
+                        </ul>
+                    </div>
+
+                    <button type="submit" class="reset-button" id="resetButton">
+                        <span class="loading-spinner" id="loadingSpinner" style="display: none;"></span>
+                        <span class="arabic-text">إعادة تعيين كلمة المرور</span>
+                        <span class="english-text">Reset Password</span>
+                    </button>
+                </form>
+
+                <div id="successMessage" style="display: none;" class="success-message">
+                    <div class="success-icon">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="12" cy="12" r="10" stroke="#4CAF50" stroke-width="2" fill="#E8F5E8" />
+                            <path d="M9 12l2 2 4-4" stroke="#4CAF50" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                        </svg>
+                    </div>
+                    <h2 class="arabic-success">تم إعادة تعيين كلمة المرور بنجاح!</h2>
+                    <h2 class="english-success">Password Reset Successfully!</h2>
+                    <p class="arabic-success-msg">يمكنك الآن تسجيل الدخول بكلمة المرور الجديدة.</p>
+                    <p class="english-success-msg">You can now sign in with your new password.</p>
+                    <button class="login-button" onclick="openApp()">
+                        <span class="arabic-text">تسجيل الدخول</span>
+                        <span class="english-text">Sign In</span>
+                    </button>
+                </div>
+
+                <div id="errorMessage" style="display: none;" class="error-message">
+                    <div class="error-icon">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="12" cy="12" r="10" stroke="#D32F2F" stroke-width="2" fill="#FFEBEE" />
+                            <path d="M15 9l-6 6M9 9l6 6" stroke="#D32F2F" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                        </svg>
+                    </div>
+                    <h3 class="arabic-error">خطأ في إعادة التعيين</h3>
+                    <h3 class="english-error">Reset Error</h3>
+                    <p id="errorText" class="arabic-error-msg">حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى.</p>
+                    <p id="errorTextEn" class="english-error-msg">An unexpected error occurred. Please try again.</p>
+                    <button class="retry-button" onclick="resetForm()">
+                        <span class="arabic-text">إعادة المحاولة</span>
+                        <span class="english-text">Try Again</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p class="arabic-footer">© 2025 سانا - جميع الحقوق محفوظة</p>
+            <p class="english-footer">© 2025 Sana - All rights reserved</p>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
