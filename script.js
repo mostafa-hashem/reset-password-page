@@ -1,14 +1,18 @@
-// Reset Password Page Script
+// Reset Password Page Script for Sana'a App
+
 document.addEventListener('DOMContentLoaded', function () {
-    // Get URL parameters
+    // Get tokens from URL hash (Supabase sends tokens in hash fragment)
+    const hashParams = new URLSearchParams(window.location.hash.substring(1));
+    const accessToken = hashParams.get('access_token');
+    const refreshToken = hashParams.get('refresh_token');
+    const type = hashParams.get('type');
+
+    // Also check URL params as fallback
     const urlParams = new URLSearchParams(window.location.search);
-    const token = urlParams.get('token');
-    const accessToken = urlParams.get('access_token');
-    const refreshToken = urlParams.get('refresh_token');
-    const type = urlParams.get('type');
+    const token = urlParams.get('token') || accessToken;
 
     // Elements
-    const resetForm = document.getElementById('resetForm');
+    const resetFormElement = document.getElementById('resetForm');
     const resetButton = document.getElementById('resetButton');
     const loadingSpinner = document.getElementById('loadingSpinner');
     const initialMessage = document.getElementById('initialMessage');
@@ -77,7 +81,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Show success message
     function showSuccess() {
-        resetForm.style.display = 'none';
+        resetFormElement.style.display = 'none';
         initialMessage.style.display = 'none';
         successMessage.style.display = 'block';
         errorMessage.style.display = 'none';
@@ -88,16 +92,16 @@ document.addEventListener('DOMContentLoaded', function () {
     function showError(arabicMessage, englishMessage) {
         document.getElementById('errorText').textContent = arabicMessage;
         document.getElementById('errorTextEn').textContent = englishMessage;
-        resetForm.style.display = 'none';
+        resetFormElement.style.display = 'none';
         initialMessage.style.display = 'none';
         successMessage.style.display = 'none';
         errorMessage.style.display = 'block';
         resetCard.style.borderColor = 'var(--error-color)';
     }
 
-    // Reset form
-    function resetForm() {
-        resetForm.style.display = 'block';
+    // Reset form to initial state
+    function resetFormState() {
+        resetFormElement.style.display = 'block';
         initialMessage.style.display = 'block';
         successMessage.style.display = 'none';
         errorMessage.style.display = 'none';
@@ -109,16 +113,18 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Open app function
     function openApp() {
-        // Try to open the app
-        const appUrl = `sana://auth/reset-password`;
+        // Try to open the app using deep link
+        const appUrl = 'sana://auth/login';
+        window.location.href = appUrl;
 
-        // For web, we'll just show a message since we can't open native apps
-        // In a real implementation, this would try to open the app
-        alert('تم إعادة تعيين كلمة المرور بنجاح! يمكنك الآن فتح التطبيق وتسجيل الدخول.');
+        // Fallback message after a short delay
+        setTimeout(() => {
+            alert('تم إعادة تعيين كلمة المرور بنجاح! يمكنك الآن فتح التطبيق وتسجيل الدخول.\n\nPassword reset successful! You can now open the app and sign in.');
+        }, 1000);
     }
 
-    // Handle form submission
-    resetForm.addEventListener('submit', async function (e) {
+    // Handle form submission - Call Supabase API
+    resetFormElement.addEventListener('submit', async function (e) {
         e.preventDefault();
 
         if (!validatePasswords()) {
@@ -130,44 +136,50 @@ document.addEventListener('DOMContentLoaded', function () {
         showLoading();
 
         try {
-            // Here you would call your backend API to reset the password
-            // For now, we'll simulate the process
-
-            // Simulate API call delay
-            await new Promise(resolve => setTimeout(resolve, 2000));
-
-            // Check if we have the required tokens
-            if (!token && !accessToken) {
+            // Check if we have the required token
+            if (!accessToken) {
                 throw new Error('Invalid or expired reset link');
             }
 
-            // In a real implementation, you would send a request to your backend
-            // const response = await fetch('/api/reset-password', {
-            //     method: 'POST',
-            //     headers: {
-            //         'Content-Type': 'application/json',
-            //     },
-            //     body: JSON.stringify({
-            //         token: token,
-            //         newPassword: newPassword,
-            //     }),
-            // });
+            // Call Supabase API to update password
+            const response = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${accessToken}`,
+                    'apikey': SUPABASE_ANON_KEY
+                },
+                body: JSON.stringify({
+                    password: newPassword
+                })
+            });
 
-            // if (!response.ok) {
-            //     throw new Error('Failed to reset password');
-            // }
+            if (response.ok) {
+                showSuccess();
+            } else {
+                const errorData = await response.json();
+                console.error('Supabase error:', errorData);
 
-            // For demo purposes, we'll assume success
-            showSuccess();
+                if (response.status === 401) {
+                    throw new Error('expired');
+                } else if (errorData.message) {
+                    throw new Error(errorData.message);
+                } else {
+                    throw new Error('Failed to reset password');
+                }
+            }
 
         } catch (error) {
             console.error('Reset password error:', error);
             let arabicMessage = 'حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى.';
             let englishMessage = 'An unexpected error occurred. Please try again.';
 
-            if (error.message.includes('expired') || error.message.includes('invalid')) {
+            if (error.message.includes('expired') || error.message.includes('invalid') || error.message.includes('Invalid')) {
                 arabicMessage = 'انتهت صلاحية رابط إعادة التعيين. يرجى طلب رابط جديد.';
                 englishMessage = 'Reset link has expired. Please request a new one.';
+            } else if (error.message.includes('weak') || error.message.includes('password')) {
+                arabicMessage = 'كلمة المرور ضعيفة جداً. استخدم كلمة مرور أقوى.';
+                englishMessage = 'Password is too weak. Please use a stronger password.';
             }
 
             showError(arabicMessage, englishMessage);
@@ -183,7 +195,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Track page view
     trackEvent('reset_password_page_viewed', {
-        token: token ? 'present' : 'missing',
         accessToken: accessToken ? 'present' : 'missing',
         refreshToken: refreshToken ? 'present' : 'missing',
         type: type || 'unknown',
@@ -191,7 +202,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     // Check if the link is valid
-    if (!token && !accessToken) {
+    if (!accessToken) {
         showError(
             'رابط إعادة التعيين غير صالح أو منتهي الصلاحية.',
             'Reset link is invalid or has expired.'
@@ -200,12 +211,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Make functions globally available
     window.openApp = openApp;
-    window.resetForm = resetForm;
+    window.resetFormState = resetFormState;
 
     // Keyboard navigation
     document.addEventListener('keydown', function (e) {
         if (e.key === 'Enter' && document.activeElement === resetButton && !resetButton.disabled) {
-            resetForm.dispatchEvent(new Event('submit'));
+            resetFormElement.dispatchEvent(new Event('submit'));
         }
     });
 });
