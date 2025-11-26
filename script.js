@@ -1,4 +1,6 @@
 // Reset Password Page Script for Sana'a App
+const SUPABASE_URL = 'SUPABASE_URL_PLACEHOLDER';
+const SUPABASE_ANON_KEY = 'SUPABASE_ANON_KEY_PLACEHOLDER';
 
 document.addEventListener('DOMContentLoaded', function () {
     // Get tokens from URL hash (Supabase sends tokens in hash fragment)
